@@ -1,25 +1,19 @@
+//importing packages
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
-
 const app = express();
-
 // Passport Config
 require('./config/passport')(passport);
 
-// DB Config
-const db = require('./config/keys').mongoURI;
-
-// Connect to MongoDB
-mongoose
-  .connect(
-    db,
-    { useNewUrlParser: true ,useUnifiedTopology: true}
+//Estabilishing connection to db
+mongoose.connect(
+    'mongodb+srv://mihir:mihir@login.xmfif.mongodb.net/login?retryWrites=true&w=majority',{useNewUrlParser: true ,useUnifiedTopology: true}
   )
-  .then(() => console.log('MongoDB Connected'))
+  .then(() => console.log('Database mongodb connected'))
   .catch(err => console.log(err));
 
 // EJS
@@ -57,6 +51,6 @@ app.use(function(req, res, next) {
 app.use('/', require('./routes/index.js'));
 app.use('/users', require('./routes/users.js'));
 
-const PORT = process.env.PORT || 6000;
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, console.log(`Server started on port ${PORT}`));
+app.listen(PORT, console.log(`Server started on port ${PORT} go to http://localhost:5000/`));
