@@ -20,10 +20,8 @@ mongoose.connect(
 // EJS
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
-
 // Express body parser
 app.use(express.urlencoded({ extended: true }));
-
 // Express session
 app.use(
   session({
@@ -32,14 +30,11 @@ app.use(
     saveUninitialized: true
   })
 );
-
 // Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
-
 // Connect flash
 app.use(flash());
-
 // Global variables
 app.use(function(req, res, next) {
   res.locals.success_msg = req.flash('success_msg');
@@ -47,11 +42,9 @@ app.use(function(req, res, next) {
   res.locals.error = req.flash('error');
   next();
 });
-
 // Routes
 app.use('/', require('./routes/index.js'));
 app.use('/users', require('./routes/users.js'));
-
 //chat start
 const socketio = require('socket.io');
 const cors = require('cors');
