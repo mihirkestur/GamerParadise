@@ -1,22 +1,4 @@
-const express = require('express');
-var app = express()
 
-const {addUser, removeUser, getUser, getUsersInRoom} = require('./users.js');
-
-const PORT = process.env.port || 5000;
-
-const socketio = require('socket.io');
-const cors = require('cors');
-
-const server = require('http').createServer();
-const options = {
-    cors:true,
-    origins:"https://example.com",
-   };
-const io = require('socket.io')(server, options);
-server.listen(PORT, () => console.log(`Server has started on ${PORT}....`));
-
-const router = require('./router')
 
 io.on('connection', (socket) => {
 

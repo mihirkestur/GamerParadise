@@ -6,6 +6,7 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
 const app = express();
+const PORT = process.env.PORT || 5000;
 // Passport Config
 require('./config/passport')(passport);
 
@@ -51,6 +52,41 @@ app.use(function(req, res, next) {
 app.use('/', require('./routes/index.js'));
 app.use('/users', require('./routes/users.js'));
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, console.log(`Server started on port ${PORT} go to http://localhost:5000/`));
+//chat start
+const socketio = require('socket.io');
+const cors = require('cors');
+const {addUser, removeUser, getUser, getUsersInRoom} = require('./server/users.js');
+const server = app.listen(PORT, () => console.log(`Server started on port ${PORT} go to http://localhost:5000/`));//require('http').createServer();
+const options = {
+    cors:true,
+    origins:"https://example.com",
+   };
+const io = require('socket.io')(server, options);
+const router = require('./server/router')
+io.on('connection', (socket) => {
+  console.log('We have a new connection');
+  socket.on('join', ({name, room}, callback) => {
+      const { error , user} = addUser({id: socket.id, name, room });
+      console.log(user.name, user.room);
+     if(error) return callback(error);
+      socket.emit('message', {user : 'admin', text: `${user.name}, welcome to the room ${user.room}`});
+      socket.broadcast.to(user.room).emit('message', {user : 'admin', text: `${user.name}, has joined`});
+      socket.join(user.room);
+      io.to(user.room).emit('roomData', { room : user.room, users : getUsersInRoom(user.room)})
+      callback();
+  });
+  socket.on('sendMessage', (message, callback)=> {
+      const user = getUser(socket.id);
+      io.to(user.room).emit('message', { user : user.name, text : message})
+      io.to(user.room).emit('roomData', { room : user.room, users : getUsersInRoom(user.room)})
+      callback();
+  })
+  socket.on('disconnect', () => {
+      const user = removeUser(socket.id);
+      if(user) {
+          io.to(user.room).emit('message', { user : 'admin', text : `${user.name} has left `})
+      }
+  })
+})
+app.use(router);
+//chat end
