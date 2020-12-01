@@ -55,14 +55,14 @@ app.use('/users', require('./routes/users.js'));
 //chat start
 const socketio = require('socket.io');
 const cors = require('cors');
-const {addUser, removeUser, getUser, getUsersInRoom} = require('./server/users.js');
+const {addUser, removeUser, getUser, getUsersInRoom} = require('./models/users.js');
 const server = app.listen(PORT, () => console.log(`Server started on port ${PORT} go to http://localhost:5000/`));//require('http').createServer();
 const options = {
     cors:true,
     origins:"https://example.com",
    };
 const io = require('socket.io')(server, options);
-const router = require('./server/router')
+const router = require('./routes/router')
 io.on('connection', (socket) => {
   console.log('We have a new connection');
   socket.on('join', ({name, room}, callback) => {
